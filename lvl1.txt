@@ -1,9 +1,9 @@
+    Z          W
+   GGG      Z  W
+           GGG W
+       B       W
+               W
+GGGGGGGGGGGG   W
 
-    C
-   GGG       C
-            GGG
-G      C
-GS    GGGG
- GG
-
-GGSSSGGGGGGGGGG
+R             F
+GGSSSGGGGSSGGGGG

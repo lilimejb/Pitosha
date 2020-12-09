@@ -17,8 +17,6 @@ class Sprite(pg.sprite.Sprite):
         self.y = y
         self.image = pg.image.load(image)
         self.image = pg.transform.scale(self.image, (self.size, self.size))
-        self.image_true = self.image
-        self.image_flipped = pg.transform.flip(self.image, True, False)
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(x, y)
 
@@ -47,8 +45,12 @@ class Coin(Sprite):
     def __init__(self, x=None, y=None, value=5, size=50, speed=10, image=COINS[0]):
         if x is None:
             self.x = random.randint(0, WIN_SIZE[0] - size)
+        else:
+            self.x = x
         if y is None:
             self.y = random.randint(0, WIN_SIZE[1] - size)
+        else:
+            self.y = y
         super().__init__(self.x, self.y, size, speed, image)
         self.ticks = random.choice(range(0, 360, 5))
         self.forward = 1
@@ -77,22 +79,10 @@ class Spike(Sprite):
             self.y = y
         Sprite.__init__(self, self.x, self.y, size, speed, image)
         self.damage = damage
-        self.delay = 1000
-        self.cooldown = self.delay
-
-    def deal_damage(self, ms):
-        if self.cooldown > 0:
-            self.cooldown -= ms
-            return 0
-        if self.cooldown <= 0:
-            self.cooldown = 0
-        if self.cooldown == 0:
-            self.cooldown = self.delay
-            return self.damage
 
 
 class Medkit(Sprite):
-    def __init__(self, x=None, y=None, healing=500, size=50, speed=10, image=random.choice(FOOD)):
+    def __init__(self, x=None, y=None, healing=500, size=50, speed=10, image=FOOD[0]):
         if x is None:
             self.x = random.randint(0, WIN_SIZE[0] - size)
         else:
@@ -122,6 +112,7 @@ class Player(Sprite):
     coins = None
     spikes = None
     medkits = None
+    solid_blocks = None
 
     def __init__(self, x=0, y=0, size=100, speed=10, image=PLAYER_ASSETS['idle'][0]):
         self.money = 0
@@ -131,6 +122,10 @@ class Player(Sprite):
         self.x = x
         self.y = y
         Sprite.__init__(self, self.x, self.y, size, speed, image)
+        self.image_true = self.image
+        self.image_flipped = pg.transform.flip(self.image, True, False)
+        self.delay = 1000
+        self.cooldown = self.delay
 
     def update(self, up, down, left, right, ms):
         if left == right:
@@ -156,7 +151,7 @@ class Player(Sprite):
 
         for spike in self.spikes:
             if pg.sprite.collide_rect(self, spike):
-                self.hp -= spike.deal_damage(ms)
+                self.hp -= self.take_damage(ms, spike.damage)
 
         for medkit in self.medkits:
             if pg.sprite.collide_rect(self, medkit):
@@ -166,6 +161,21 @@ class Player(Sprite):
             self.respawn()
         if self.hp > self.hp_max:
             self.hp = self.hp_max
+
+        # for block in self.solid_blocks:
+        #     if pg.sprite.collide_rect(self, block):
+        #         if self.rect.bottom:
+        #             pass
+
+    def take_damage(self, ms, damage):
+        if self.cooldown > 0:
+            self.cooldown -= ms
+            return 0
+        if self.cooldown <= 0:
+            self.cooldown = 0
+        if self.cooldown == 0:
+            self.cooldown = self.delay
+            return damage
 
     def respawn(self):
         self.money = self.money // 10
@@ -178,10 +188,8 @@ class Game:
     def __init__(self):
         pg.init()
         self.display = pg.display.set_mode(WIN_SIZE)
-        self.bg_image_first = pg.image.load(BACKGROUNDS['first'])
-        self.bg_image_second = pg.image.load(BACKGROUNDS['second'])
-        self.bg_image_first = pg.transform.scale(self.bg_image_first, (WIN_SIZE[0], WIN_SIZE[1]))
-        self.bg_image_second = pg.transform.scale(self.bg_image_second, (WIN_SIZE[0], WIN_SIZE[1]))
+        self.bg_image = pg.image.load(BACKGROUNDS)
+        self.bg_image = pg.transform.scale(self.bg_image, (WIN_SIZE[0], WIN_SIZE[1]))
         self.clock = pg.time.Clock()
         self.running = True
         self.down = self.up = self.left = self.right = False
@@ -189,32 +197,60 @@ class Game:
         self.enemies = pg.sprite.Group()
         self.help = pg.sprite.Group()
         self.coins = pg.sprite.Group()
-        for _ in range(random.randint(1, 25)):
-            image = COINS[random.randint(0, 4)]
-            if image == COINS[0]:
-                Coin(image=image, value=5).add(self.coins, self.objects)
-            if image == COINS[1]:
-                Coin(image=image, value=10).add(self.coins, self.objects)
-            if image == COINS[2]:
-                Coin(image=image, value=15).add(self.coins, self.objects)
-            if image == COINS[3]:
-                Coin(image=image, value=20).add(self.coins, self.objects)
-            if image == COINS[4]:
-                Coin(image=image, value=25).add(self.coins, self.objects)
+        self.solid_blocks = pg.sprite.Group()
+        self.load_map()
+        spike = Spike(image=SPIKE)
+        spike.add(self.enemies)
+        for coin in self.coins:
+            if coin.image == COINS[0]:
+                coin.value = 5
+            if coin.image == COINS[1]:
+                coin.value = 5
+            if coin.image == COINS[2]:
+                coin.value = 5
+            if coin.image == COINS[3]:
+                coin.value = 5
+            if coin.image == COINS[4]:
+                coin.value = 5
         Player.coins = self.coins
-        for _ in range(random.randint(1, 10)):
-            Spike().add(self.enemies, self.objects)
         Player.spikes = self.enemies
-        self.medkit = Medkit()
-        self.medkit.add(self.help, self.objects)
+        # for meal in self.help:
+        #     meal.image = random.choice(FOOD)
         Player.medkits = self.help
         self.player = Player()
-        self.player.add(self.objects)
 
         self.played = 0
 
     def restart(self):
         self.__init__()
+
+    def load_map(self):
+        map_path = 'lvl1.txt'
+        with open(map_path, encoding='utf-8') as file:
+            for y, line in enumerate(file):
+                for x, letter in enumerate(line):
+                    if letter in MAP.keys():
+                        pos = x * TILE_SIZE, y * TILE_SIZE
+                        image = MAP[letter]
+                        if letter in SOLID_BLOCKS:
+                            block = Sprite(*pos, image=image)
+                            self.solid_blocks.add(block)
+                            if letter == 'S':
+                                block = Spike(*pos, image=image)
+                                self.enemies.add(block)
+                        elif letter == 'R':
+                            block = Coin(*pos, image=image)
+                            self.coins.add(block)
+                        elif letter == 'B':
+                            block = Coin(*pos, image=image)
+                            self.coins.add(block)
+                        elif letter == 'Z':
+                            block = Coin(*pos, image=image)
+                            self.coins.add(block)
+                        elif letter == 'F':
+                            block = Medkit(*pos, image=image)
+                            self.help.add(block)
+                        self.objects.add(block)
 
     def run(self):
         while self.running:
@@ -259,12 +295,12 @@ class Game:
             f'Player`s money: {self.player.money}, Played time: {self.played:.2f} HP: {self.player.hp}')
         self.player.update(self.up, self.down, self.left, self.right, ms)
         self.coins.update()
-        self.medkit.update()
+        self.help.update()
 
     def render(self):
-        self.display.blit(self.bg_image_first, (0, 0))
-        self.display.blit(self.bg_image_second, (0, 0))
+        self.display.blit(self.bg_image, (0, 0))
         self.objects.draw(self.display)
+        self.player.draw(self.display)
         pg.display.update()
 
 

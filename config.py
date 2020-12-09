@@ -1,6 +1,8 @@
 import os
+import random
 
-WIN_SIZE = (800, 600)
+TILE_SIZE = 64
+WIN_SIZE = (16 * TILE_SIZE, 9 * TILE_SIZE)
 FPS = 60
 
 # COLOR =     R    G    B
@@ -95,8 +97,7 @@ BLOCK_ASSETS = {'ground': [os.path.join(blocks_sprites, 'ground.png'),
                 'windows': [os.path.join(blocks_sprites, 'window.png'),
                             os.path.join(blocks_sprites, 'window-bars.png')]}
 
-BACKGROUNDS = {'first': os.path.join(backgrounds, 'background.png'),
-               'second': os.path.join(backgrounds, 'middleground.png')}
+BACKGROUNDS = os.path.join(backgrounds, 'background.bmp')
 
 level_items = os.path.join(images, 'level_items')
 BARREL = os.path.join(level_items, 'barrel.png')
@@ -192,4 +193,14 @@ woman = os.path.join(enemies, 'woman')
 
 SPIKE = os.path.join(enemies, 'spike.png')
 
+MAP = {
+    'Z': COINS[2],
+    'R': COINS[4],
+    'B': COINS[0],
+    'G': BLOCK_ASSETS['ground'][0],
+    'S': SPIKE,
+    'F': FOOD[0],
+    'W': os.path.join(images, 'rat.png')
+}
 
+SOLID_BLOCKS = 'GSW'
