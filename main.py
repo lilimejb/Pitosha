@@ -100,7 +100,7 @@ class Player(Sprite):
     medkits = None
     solid_blocks = None
 
-    def __init__(self, x=300, y=300, size=100, speed=0, image=PLAYER_ASSETS['idle'][0]):
+    def __init__(self, x=300, y=300, size=80, speed=0, image=PLAYER_ASSETS['idle'][0]):
         self.money = 0
         self.hp_max = 1200
         self.hp_start = self.hp_max - 200
