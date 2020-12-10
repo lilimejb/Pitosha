@@ -1,6 +1,6 @@
 import os
-import random
 
+GRAVITY = .5
 TILE_SIZE = 64
 WIN_SIZE = (16 * TILE_SIZE, 9 * TILE_SIZE)
 FPS = 60

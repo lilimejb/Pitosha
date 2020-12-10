@@ -23,20 +23,6 @@ class Sprite(pg.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect.topleft)
 
-    def border_check(self):
-
-        if self.rect.left < 0:
-            self.rect.left = 0
-
-        if self.rect.right > WIN_SIZE[0]:
-            self.rect.right = WIN_SIZE[0]
-
-        if self.rect.top < 0:
-            self.rect.top = 0
-
-        if self.rect.bottom > WIN_SIZE[1]:
-            self.rect.bottom = WIN_SIZE[1]
-
     def update(self, *args):
         pass
 
@@ -114,7 +100,7 @@ class Player(Sprite):
     medkits = None
     solid_blocks = None
 
-    def __init__(self, x=0, y=0, size=100, speed=10, image=PLAYER_ASSETS['idle'][0]):
+    def __init__(self, x=300, y=300, size=100, speed=0, image=PLAYER_ASSETS['idle'][0]):
         self.money = 0
         self.hp_max = 1200
         self.hp_start = self.hp_max - 200
@@ -126,29 +112,66 @@ class Player(Sprite):
         self.image_flipped = pg.transform.flip(self.image, True, False)
         self.delay = 1000
         self.cooldown = self.delay
+        self.acceleration = .1
+        self.speed_y = 0
+        self.speed_x = 0
+        self.on_the_ground = False
+        self.jump_power = 10
 
     def update(self, up, down, left, right, ms):
-        if left == right:
-            pass
-        elif left:
-            self.rect.x -= self.speed
-            self.image = self.image_flipped
-        else:
-            self.rect.x += self.speed
-            self.image = self.image_true
+        self.move(up, down, left, right)
+        self.collide_check(ms)
+        print(self.rect.x, self.rect.y, self.on_the_ground, self.speed_y, self.speed_x)
+        if self.hp <= 0:
+            self.respawn()
+        if self.hp > self.hp_max:
+            self.hp = self.hp_max
+
+    def move(self, up, down, left, right):
         if up == down:
             pass
-        elif up:
-            self.rect.y -= self.speed
+        if not self.on_the_ground:
+            self.speed_y += GRAVITY
         else:
-            self.rect.y += self.speed
-        self.border_check()
+            self.speed_y = 0
+        if up and self.on_the_ground:
+            self.speed_y -= self.jump_power
+            self.on_the_ground = False
+        self.rect.bottom += self.speed_y
+        for block in self.solid_blocks:
+            if pg.sprite.collide_rect(self, block):
+                if self.speed_y < 0:
+                    self.rect.top = block.rect.bottom
+                    self.speed_y = 0
+                else:
+                    self.rect.bottom = block.rect.top
+                    self.on_the_ground = True
 
+        if left == right:
+            self.speed_x = 0
+        elif left:
+            self.speed_x -= self.acceleration
+            self.image = self.image_flipped
+        else:
+            self.speed_x += self.acceleration
+            self.image = self.image_true
+        self.rect.x += self.speed_x
+        for block in self.solid_blocks:
+            if pg.sprite.collide_rect(self, block):
+                if self.speed_x < 0:
+                    self.rect.left = block.rect.right
+                    self.speed_x = 0
+                else:
+                    self.rect.right = block.rect.left
+                    self.speed_x = 0
+
+    def collide_check(self, ms):
         for coin in self.coins:
             if pg.sprite.collide_rect(self, coin):
                 self.money += coin.value
                 coin.kill()
 
+        # TODO шипы твёрдый блок. поменять!
         for spike in self.spikes:
             if pg.sprite.collide_rect(self, spike):
                 self.hp -= self.take_damage(ms, spike.damage)
@@ -157,15 +180,6 @@ class Player(Sprite):
             if pg.sprite.collide_rect(self, medkit):
                 self.hp += medkit.heal
                 medkit.kill()
-        if self.hp <= 0:
-            self.respawn()
-        if self.hp > self.hp_max:
-            self.hp = self.hp_max
-
-        # for block in self.solid_blocks:
-        #     if pg.sprite.collide_rect(self, block):
-        #         if self.rect.bottom:
-        #             pass
 
     def take_damage(self, ms, damage):
         if self.cooldown > 0:
@@ -214,6 +228,7 @@ class Game:
                 coin.value = 5
         Player.coins = self.coins
         Player.spikes = self.enemies
+        Player.solid_blocks = self.solid_blocks
         # for meal in self.help:
         #     meal.image = random.choice(FOOD)
         Player.medkits = self.help
