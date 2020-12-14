@@ -1,6 +1,9 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
+    <inspection_tool class="PyChainedComparisonsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoreConstantInTheMiddle" value="true" />
+    </inspection_tool>
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
@@ -31,6 +34,25 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="str.replace" />
+          <option value="main_files.PygameCell.life.Life.cell_size" />
+          <option value="main_files.PygameCell.life.Life.left" />
+          <option value="main_files.PygameCell.life.Life.top" />
+          <option value="main_files.PygameCell.life.Life.width" />
+          <option value="main_files.PygameCell.life.Life.height" />
+          <option value="main_files.PygameCell.life.Life.get_click" />
+          <option value="main_files.PygameCell.minesweeper.Life.board" />
+          <option value="main_files.PygameCell.minesweeper.Life.height" />
+          <option value="main_files.PygameCell.minesweeper.Life.*" />
+          <option value="main_files.PygameCell.minesweeper.Minesweeper.get_click" />
+          <option value="main_files.PygameCell.minesweeper.Minesweeper.cell_size" />
+          <option value="main_files.PygameCell.minesweeper.Minesweeper.*" />
+          <option value="main_files.PygameCell.lines.Lines.cell_size" />
+          <option value="main_files.PygameCell.lines.Lines.left" />
+          <option value="main_files.PygameCell.lines.Lines.top" />
+          <option value="main_files.PygameCell.lines.Lines.width" />
+          <option value="main_files.PygameCell.lines.Lines.height" />
+          <option value="main_files.PygameCell.lines.Lines.board" />
+          <option value="main_files.PygameCell.lines.Lines.get_click" />
         </list>
       </option>
     </inspection_tool>

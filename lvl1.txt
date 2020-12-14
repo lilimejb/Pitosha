@@ -1,9 +1,0 @@
-    Z          W
-   GGG      Z  W
-           GGG W
-       B       W
-               W
-GGGGGGGGGGGG   W
-
-R             F
-GGSSSGGGGSSGGGGG

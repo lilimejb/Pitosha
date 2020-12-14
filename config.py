@@ -1,14 +1,11 @@
+import pygame as pg
 import os
 
-GRAVITY = .5
 TILE_SIZE = 64
 WIN_SIZE = (16 * TILE_SIZE, 9 * TILE_SIZE)
+BG_COLOR = pg.Color('cyan')
 FPS = 60
-
-# COLOR =     R    G    B
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BG_COLOR = (135, 206, 250)
+GRAVITY = .5
 
 # PICS
 current_dir = os.path.dirname(__file__)
@@ -97,7 +94,7 @@ BLOCK_ASSETS = {'ground': [os.path.join(blocks_sprites, 'ground.png'),
                 'windows': [os.path.join(blocks_sprites, 'window.png'),
                             os.path.join(blocks_sprites, 'window-bars.png')]}
 
-BACKGROUNDS = os.path.join(backgrounds, 'background.bmp')
+BACKGROUND = os.path.join(backgrounds, 'background.bmp')
 
 level_items = os.path.join(images, 'level_items')
 BARREL = os.path.join(level_items, 'barrel.png')
@@ -178,6 +175,9 @@ FOOD = [os.path.join(heal, 'Apple.png'),
         os.path.join(heal, 'Whiskey.png'),
         os.path.join(heal, 'Wine.png')]
 
+enemies = os.path.join(images, 'enemies')
+SPIKE = os.path.join(enemies, 'spike.png')
+
 coins = os.path.join(consumable, 'coins')
 COINS = [os.path.join(coins, 'Coin_Blue.png'),
          os.path.join(coins, 'Coin_Gold.png'),
@@ -185,22 +185,10 @@ COINS = [os.path.join(coins, 'Coin_Blue.png'),
          os.path.join(coins, 'Coin_Purple.png'),
          os.path.join(coins, 'Coin_Red.png')]
 
-enemies = os.path.join(images, 'enemies')
-bearded = os.path.join(enemies, 'bearded')
-hat_man = os.path.join(enemies, 'hat_man')
-old_man = os.path.join(enemies, 'old_man')
-woman = os.path.join(enemies, 'woman')
+MAP_BLOCKS = {'B': BLOCK_ASSETS['ground'][0],
+              'C': COINS[0],
+              'S': SPIKE,
+              'F': FOOD[0]}
 
-SPIKE = os.path.join(enemies, 'spike.png')
-
-MAP = {
-    'Z': COINS[2],
-    'R': COINS[4],
-    'B': COINS[0],
-    'G': BLOCK_ASSETS['ground'][0],
-    'S': SPIKE,
-    'F': FOOD[0],
-    'W': os.path.join(images, 'rat.png')
-}
-
-SOLID_BLOCKS = 'GSW'
+SOLID_BLOCKS = 'BS'
+CONSUMABLES = 'FC'
