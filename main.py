@@ -30,6 +30,9 @@ class Game:
         self.player = Player()
         self.player.add(self.objects)
 
+    def restart(self):
+        self.__init__()
+
     def events(self):
         events = pg.event.get()
         for event in events:
@@ -44,6 +47,8 @@ class Game:
                     self.jump = True
                 if event.key == pg.K_s:
                     self.fall = True
+                if event.key == pg.K_r:
+                    self.restart()
             if event.type == pg.KEYUP:
                 if event.key == pg.K_d:
                     self.right = False

@@ -35,15 +35,20 @@ class Player(Sprite):
 
     def move(self, jump, fall, left, right):
         if left == right:
-            self.speed_x = 0
+            self.speed_x *= .9
+            if abs(self.speed_x) < .5:
+                self.speed_x = 0
         elif left:
             self.speed_x -= self.speed
             self.image = self.image_flipped
+            if abs(self.speed_x) > self.speed_max:
+                self.speed_x = -self.speed_max
         elif right:
             self.speed_x += self.speed
             self.image = self.image_true
-        if abs(self.speed_x) > self.speed_max:
-            self.speed_x = self.speed_max
+            if abs(self.speed_x) > self.speed_max:
+                self.speed_x = self.speed_max
+
         self.rect.x += self.speed_x
         for block in self.solid_blocks:
             if pg.sprite.collide_rect(self, block):
@@ -74,7 +79,7 @@ class Player(Sprite):
                 else:
                     self.rect.bottom = block.rect.top
                     self.on_the_ground = True
-            if 0 <= self.rect.x - block.rect.x <= TILE_SIZE:
+            if -TILE_SIZE <= self.rect.x - block.rect.x <= TILE_SIZE:
                 if block.rect.top == self.rect.bottom:
                     is_collide = True
         self.on_the_ground = is_collide
